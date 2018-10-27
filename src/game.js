@@ -1,15 +1,4 @@
 /* global requestAnimationFrame */
-var simpleLevelPlan = `
-......................
-..#................#..
-..#..............=.#..
-..#.........o.o....#..
-..#.@......#####...#..
-..#####............#..
-......#++++++++++++#..
-......##############..
-......................`
-
 var Level = class Level {
   constructor (plan) {
     let rows = plan.trim().split('\n').map(l => [...l])
@@ -29,8 +18,16 @@ var Level = class Level {
   }
 }
 
-var State = class State {
+class Silo {
+  constructor () {
+    
+  }
+  // Silo for isolating State's prototypal variables
+}
+
+class State extends Silo {
   constructor (level, actors, status) {
+    super()
     this.level = level
     this.actors = actors
     this.status = status
@@ -43,6 +40,18 @@ var State = class State {
   get player () {
     return this.actors.find(a => a.type === 'player')
   }
+  
+  // PROTOTYPAL VARIABLES FOR SUSTAINED VALUES ACROSS INSTANCES
+  
+  get timer () {
+    return this.__proto__.timer
+  }
+  
+  set timer (newTime) {
+    this.__proto__.timer = newTime
+  }
+  
+  // END OF PROTOTYPAL VARIABLES
 }
 
 var Vec = class Vec {
@@ -124,85 +133,7 @@ var levelChars = {
   'v': Lava
 }
 
-var simpleLevel = new Level(simpleLevelPlan) // eslint-disable-line no-unused-vars
-
-function elt (name, attrs, ...children) {
-  let dom = document.createElement(name)
-  for (let attr of Object.keys(attrs)) {
-    dom.setAttribute(attr, attrs[attr])
-  }
-  for (let child of children) {
-    dom.appendChild(child)
-  }
-  return dom
-}
-
-var DOMDisplay = class DOMDisplay {
-  constructor (parent, level) {
-    this.dom = elt('div', {class: 'game'}, drawGrid(level))
-    this.actorLayer = null
-    parent.appendChild(this.dom)
-  }
-
-  clear () { this.dom.remove() }
-}
-
-var scale = 20
-
-function drawGrid (level) {
-  return elt('table', {
-    class: 'background',
-    style: `width: ${level.width * scale}px`
-  }, ...level.rows.map(row =>
-    elt('tr', {style: `height: ${scale}px`},
-        ...row.map(type => elt('td', {class: type})))
-  ))
-}
-
-function drawActors (actors) {
-  return elt('div', {}, ...actors.map(actor => {
-    let rect = elt('div', {class: `actor ${actor.type}`})
-    rect.style.width = `${actor.size.x * scale}px`
-    rect.style.height = `${actor.size.y * scale}px`
-    rect.style.left = `${actor.pos.x * scale}px`
-    rect.style.top = `${actor.pos.y * scale}px`
-    return rect
-  }))
-}
-
-DOMDisplay.prototype.syncState = function (state) {
-  if (this.actorLayer) this.actorLayer.remove()
-  this.actorLayer = drawActors(state.actors)
-  this.dom.appendChild(this.actorLayer)
-  this.dom.className = `game ${state.status}`
-  this.scrollPlayerIntoView(state)
-}
-
-DOMDisplay.prototype.scrollPlayerIntoView = function (state) {
-  let width = this.dom.clientWidth
-  let height = this.dom.clientHeight
-  let margin = width / 3
-
-  // The viewport
-  let left = this.dom.scrollLeft
-  let right = left + width
-  let top = this.dom.scrollTop
-  let bottom = top + height
-
-  let player = state.player
-  let center = player.pos.plus(player.size.times(0.5)).times(scale)
-
-  if (center.x < left + margin) {
-    this.dom.scrollLeft = center.x - margin
-  } else if (center.x > right - margin) {
-    this.dom.scrollLeft = center.x + margin - width
-  }
-  if (center.y < top + margin) {
-    this.dom.scrollTop = center.y - margin
-  } else if (center.y > bottom - margin) {
-    this.dom.scrollTop = center.y + margin - height
-  }
-}
+var scale = 20 // eslint-disable-line no-unused-vars
 
 Level.prototype.touches = function (pos, size, type) {
   var xStart = Math.floor(pos.x)
@@ -228,6 +159,8 @@ State.prototype.update = function (time, keys) {
 
   if (newState.status !== 'playing') return newState
 
+  if (!this.timeLeft(time)) return new State(this.level, actors, 'lost')
+
   let player = newState.player
   if (this.level.touches(player.pos, player.size, 'lava')) {
     return new State(this.level, actors, 'lost')
@@ -239,6 +172,15 @@ State.prototype.update = function (time, keys) {
     }
   }
   return newState
+}
+
+State.prototype.timeLeft = function (timeStep) {
+  this.timer -= timeStep
+  if (this.timer < 0) {
+    this.timer = 0
+    return false
+  }
+  return true
 }
 
 function overlap (actor1, actor2) {
@@ -359,7 +301,8 @@ function runLevel (level, Display) {
 
 async function runGame (plans, Display) { // eslint-disable-line no-unused-vars
   for (let level = 0; level < plans.length;) {
-    let status = await runLevel(new Level(plans[level]), Display)
+    State.prototype.timer = plans[level].timeLimit
+    let status = await runLevel(new Level(plans[level].map), Display)
     if (status === 'won') level++
   }
   console.log("You've won!")

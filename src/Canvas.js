@@ -1,11 +1,4 @@
 /* global scale */
-var results = [ // eslint-disable-line no-unused-vars
-  {name: 'Satisfied', count: 1043, color: 'lightblue'},
-  {name: 'Neutral', count: 563, color: 'lightgreen'},
-  {name: 'Unsatisfied', count: 510, color: 'pink'},
-  {name: 'No comment', count: 175, color: 'silver'}
-]
-
 function flipHorizontally (context, around) {
   context.translate(around, 0)
   context.scale(-1, 1)
@@ -40,6 +33,7 @@ CanvasDisplay.prototype.setState = function (state) {
   this.clearDisplay(state.status)
   this.drawActors(state.actors)
   this.drawBackground(state.level)
+  this.drawOverlay(state)
 }
 
 CanvasDisplay.prototype.updateViewport = function (state) {
@@ -135,4 +129,26 @@ CanvasDisplay.prototype.drawActors = function (actors) {
       this.cx.drawImage(otherSprites, tileX, 0, width, height, x, y, width, height)
     }
   }
+}
+
+CanvasDisplay.prototype.drawOverlay = function (state) {
+  this.drawTimer(state.timer)
+}
+
+CanvasDisplay.prototype.drawTimer = function (timer) {
+  let clock = 'Time Remaining: '
+  clock += Math.floor(timer / 60) + ':' // MINUTES
+  let seconds = Math.floor(timer % 60) // SECONDS
+  clock += ((seconds < 10) ? '0' : '') + seconds // Add a leading 0 if less than 10 seconds
+  this.cx.font = '14px Verdana'
+  this.cx.fillStyle = '#000000'
+
+  if (timer < 15 && timer !== 0) { // Detailed time if less than 15 seconds remain
+    let centiseconds = (Math.floor(timer * 100) % 100)
+    clock += '.' + ((centiseconds < 10) ? '0' : '') + centiseconds // Add a leading 0 if less than 10 centiseconds
+    this.cx.fillStyle = '#FF0000'
+    // if (timer % 1 > 0.6) clock = 'Time Remaining:' // Blink
+  }
+
+  this.cx.fillText(clock, 10, 30)
 }

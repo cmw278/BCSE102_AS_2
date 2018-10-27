@@ -1,6 +1,6 @@
 #################################################################
 #                                                               #
-#                 BCSE102_AS_2 | ITERATION 1                    #
+#                 BCSE102_AS_2 | ITERATION 2                    #
 #                                                               #
 #               ANALYZING THE  STARTING SYSTEM                  #
 #                                                               #
@@ -12,12 +12,22 @@
 This Git was created for the purpose of version control for the
 second assignment in my second semester programming paper.
 
-The code contained in this first iteration is not my own, but
-sourced from the 3rd edition of Eloquent JavaScript, written by
+The base code for this assignment is not my own, but sourced 
+from the 3rd edition of Eloquent JavaScript, written by
 Marijn Haverbeke ( https://eloquentjavascript.net ).
 
 Any and all subsequent modifications made to this game are my
 own.
+
+#################################################################
+
+Changes made in iteration 2:
+
+  - Added a level timer (different time limit for each level)
+
+Changes made in iteration 1:
+
+  - Modified player sprite and level graphics
 
 #################################################################
 
