@@ -1,8 +1,8 @@
 #################################################################
 #                                                               #
-#                 BCSE102_AS_2 | ITERATION 2                    #
+#                 BCSE102_AS_2 | ITERATION 3                    #
 #                                                               #
-#               ANALYZING THE  STARTING SYSTEM                  #
+#                     LIVES AND POINTS                          #
 #                                                               #
 #################################################################
 
@@ -20,6 +20,13 @@ Any and all subsequent modifications made to this game are my
 own.
 
 #################################################################
+
+Changes made in iteration 3:
+
+  - Added lives
+  - Added points
+  - Separated classes into different files
+  - Created Game class
 
 Changes made in iteration 2:
 
