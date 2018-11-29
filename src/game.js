@@ -1,18 +1,19 @@
 /* global requestAnimationFrame State Level */
 function trackKeys (keys) {
   let down = Object.create(null)
+  down.Pause = false
   function track (event) {
     if (keys.includes(event.key)) {
       down[event.key] = event.type === 'keydown'
       event.preventDefault()
     }
   }
-  window.addEventListener('keydown', track)
-  window.addEventListener('keyup', track)
+  window.onkeydown = track
+  window.onkeyup = track
   return down
 }
 
-var arrowKeys = trackKeys(['ArrowLeft', 'ArrowRight', 'ArrowUp'])
+var arrowKeys = trackKeys(['ArrowLeft', 'ArrowRight', 'ArrowUp', 'Pause'])
 
 var Game = class Game {
   constructor () {
@@ -20,6 +21,7 @@ var Game = class Game {
     this.pointsBuffer = 0
     this.lives = 3
     this.timer = null
+    this.paused = true
   }
 
   get points () {
@@ -82,6 +84,7 @@ async function runGame (plans, Display) { // eslint-disable-line no-unused-vars
   State.prototype.game = game
   for (let level = 0; level < plans.length;) {
     game.timer = plans[level].timeLimit
+    game.paused = true
     state = await runLevel(new Level(plans[level].map), Display)
     let status = state.status
     if (status === 'won') {
@@ -102,7 +105,7 @@ function runLevel (level, Display) {
     runAnimation(time => {
       state = state.update(time, arrowKeys)
       display.setState(state)
-      if (state.status === 'playing') {
+      if (state.status === 'playing' || state.status === 'paused') {
         return true
       } else if (ending > 0) {
         ending -= time

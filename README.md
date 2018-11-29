@@ -1,8 +1,8 @@
 #################################################################
 #                                                               #
-#                 BCSE102_AS_2 | ITERATION 3                    #
+#                 BCSE102_AS_2 | ITERATION 4                    #
 #                                                               #
-#                     LIVES AND POINTS                          #
+#                        PAUSE MENU                             #
 #                                                               #
 #################################################################
 
@@ -20,6 +20,11 @@ Any and all subsequent modifications made to this game are my
 own.
 
 #################################################################
+
+Changes made in iteration 4:
+
+  - Added a pause button
+  - Start levels paused
 
 Changes made in iteration 3:
 

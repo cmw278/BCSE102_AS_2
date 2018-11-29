@@ -6,7 +6,7 @@ class State { // eslint-disable-line no-unused-vars
   }
 
   static start (level) {
-    return new State(level, level.startActors, 'playing')
+    return new State(level, level.startActors, 'paused')
   }
 
   get player () {
@@ -14,11 +14,27 @@ class State { // eslint-disable-line no-unused-vars
   }
 
   update (time, keys) {
-    let { level, actors, status } = this
+    let { level, actors, status, game } = this
+    if (game.paused) {
+      for (let aKey in keys) {
+        if (keys[aKey]) {
+          game.paused = false
+          status = 'playing'
+        }
+      }
+    }
+    if (!game.paused && keys.Pause === true) {
+      game.paused = true
+      status = 'paused'
+    }
+    
+    if (status === 'paused') return new State(level, actors, status)
+    if (status!== 'playing') keys = {}
+    
     actors = actors.map(actor => actor.update(time, this, keys))
     let newState = new State(level, actors, status)
-
-    if (newState.status !== 'playing') return newState
+    
+    if (status !== 'playing') return newState
 
     if (!this.game.countDown(time)) return new State(level, actors, 'lost')
 

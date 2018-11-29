@@ -11,6 +11,9 @@ var lifeGraphic = document.createElement('img')
 lifeGraphic.src = 'img/heart.png'
 var lifeGraphicWidth = 20
 
+var gameFontPaused = 'bold 30px Verdana'
+var gameFontNormal = 'bold 16px Verdana'
+
 function flipHorizontally (context, around) {
   context.translate(around, 0)
   context.scale(-1, 1)
@@ -139,10 +142,11 @@ var CanvasDisplay = class CanvasDisplay { // eslint-disable-line no-unused-vars
     this.drawTimer(game)
     this.drawPoints(game)
     this.drawLives(game.lives)
+    if (game.paused) this.pauseMenu(game)
   }
 
   drawTimer (game) {
-    this.cx.font = 'bold 16px Verdana'
+    this.cx.font = gameFontNormal
     this.cx.fillStyle = '#000000'
     if (game.timer < 15) this.cx.fillStyle = '#FF0000'
     this.cx.fillText(game.clock, 10, 30)
@@ -150,7 +154,7 @@ var CanvasDisplay = class CanvasDisplay { // eslint-disable-line no-unused-vars
 
   drawPoints (game) {
     this.cx.fillStyle = 'black'
-    this.cx.font = 'bold 16px Verdana'
+    this.cx.font = gameFontNormal
     this.cx.fillText(game.points, 10, 50)
   }
 
@@ -160,5 +164,16 @@ var CanvasDisplay = class CanvasDisplay { // eslint-disable-line no-unused-vars
       xPosition -= (lifeGraphicWidth + 5)
       this.cx.drawImage(lifeGraphic, xPosition, 15)
     }
+  }
+
+  pauseMenu (game) {
+    let text = 'GAME PAUSED'
+    this.cx.font = gameFontPaused
+    let offset = this.cx.measureText(text).width
+    let { x, y } = { x: (this.canvas.width / 2) - (offset / 2), y: (this.canvas.height / 2) - 30 }
+    this.cx.fillStyle = '#00000022'
+    this.cx.fillRect(0, 0, this.canvas.width, this.canvas.height)
+    this.cx.fillStyle = '#ffffff'
+    this.cx.fillText(text, x, y)
   }
 }

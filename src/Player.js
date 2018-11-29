@@ -19,6 +19,7 @@ var Player = class Player {
 Player.prototype.size = new Vec(0.8, 1.5)
 
 Player.prototype.update = function (time, state, keys) {
+  if (state.game.paused) return this
   let xSpeed = 0
   if (keys.ArrowLeft) xSpeed -= playerXSpeed
   if (keys.ArrowRight) xSpeed += playerXSpeed
