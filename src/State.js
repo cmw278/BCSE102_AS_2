@@ -13,27 +13,30 @@ class State { // eslint-disable-line no-unused-vars
     return this.actors.find(a => a.type === 'player')
   }
 
-  update (time, keys) {
+  update (time, keys, endTimer) {
     let { level, actors, status, game } = this
     if (game.paused) {
       for (let aKey in keys) {
         if (keys[aKey]) {
-          game.paused = false
+          game.unPause()
           status = 'playing'
         }
       }
     }
     if (!game.paused && keys.Pause === true) {
-      game.paused = true
+      game.pause()
       status = 'paused'
     }
-    
+
     if (status === 'paused') return new State(level, actors, status)
-    if (status!== 'playing') keys = {}
-    
+    if (status !== 'playing') {
+      keys = {}
+      game.playSfx(status)
+    }
+
     actors = actors.map(actor => actor.update(time, this, keys))
     let newState = new State(level, actors, status)
-    
+
     if (status !== 'playing') return newState
 
     if (!this.game.countDown(time)) return new State(level, actors, 'lost')

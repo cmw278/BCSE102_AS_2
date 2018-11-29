@@ -22,8 +22,44 @@ var Game = class Game {
     this.lives = 3
     this.timer = null
     this.paused = true
+    this.gameMusic = document.createElement('audio')
+    
+    var pauseMusic = document.createElement('audio')
+    pauseMusic.src = 'sounds/title_screen.mp3'
+    
+    this.pause = function () {
+      this.paused = true
+      this.gameMusic.pause()
+      pauseMusic.play()
+    }
+    
+    this.unPause = function () {
+      this.paused = false
+      pauseMusic.src = 'sounds/title_screen.mp3' // re-defining audio source will stop it from playing and reset at the beginning
+      this.gameMusic.play()
+    }
+    
+    var win = document.createElement('audio')
+    win.src = 'sounds/stage_clear.wav'
+    
+    var lose = document.createElement('audio')
+    lose.src = 'sounds/die.wav'
+    
+    this.playSfx = function (status) {
+      this.gameMusic.pause()
+      switch (status) {
+        case 'won':
+          win.play()
+          break
+        case 'lost':
+          lose.play()
+          break
+        default:
+          console.log('Uh-oh...') // do nothing
+      }
+    }
   }
-
+  
   get points () {
     return `Score: ${this.totalPoints + this.pointsBuffer}`
   }
@@ -54,6 +90,9 @@ var Game = class Game {
   collectItem (typeOfItem) {
     switch (typeOfItem) {
       case 'coin':
+        let sfx = document.createElement('audio')
+        sfx.src = 'sounds/coin.wav'
+        sfx.play()
         this.pointsBuffer += Math.floor(this.timer * 2)
         break
       default:
@@ -75,16 +114,22 @@ var Game = class Game {
 
   end (state) {
     console.log(`You've ${state.status}!`)
+    let music = document.createElement('audio')
+    music.src = 'sounds/gameover.wav'
+    if (state.status === 'won') music.src = 'sounds/world_clear.wav'
+    music.play()
   }
 }
 
 async function runGame (plans, Display) { // eslint-disable-line no-unused-vars
+  document.getElementById('start-game').remove()
   var game = new Game()
   var state
   State.prototype.game = game
   for (let level = 0; level < plans.length;) {
     game.timer = plans[level].timeLimit
-    game.paused = true
+    game.pause()
+    game.gameMusic.src = plans[level].musicSrc
     state = await runLevel(new Level(plans[level].map), Display)
     let status = state.status
     if (status === 'won') {

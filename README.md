@@ -1,8 +1,8 @@
 #################################################################
 #                                                               #
-#                 BCSE102_AS_2 | ITERATION 4                    #
+#                 BCSE102_AS_2 | ITERATION 5                    #
 #                                                               #
-#                        PAUSE MENU                             #
+#                          AUDIO                                #
 #                                                               #
 #################################################################
 
@@ -20,6 +20,11 @@ Any and all subsequent modifications made to this game are my
 own.
 
 #################################################################
+
+Changes made in iteration 5:
+
+  - Added audio to Game class
+  - Added button to launch game
 
 Changes made in iteration 4:
 
